@@ -1,0 +1,24 @@
+# permissions for end users to edit servicedefaults.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: servicedefault-editor-role
+rules:
+- apiGroups:
+  - consul.io
+  resources:
+  - servicedefaults
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - consul.io
+  resources:
+  - servicedefaults/status
+  verbs:
+  - get
