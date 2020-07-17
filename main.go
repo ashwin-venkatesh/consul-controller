@@ -29,7 +29,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	consuliov1alpha1 "github.com/hashicorp/consul-controller/api/v1alpha1"
+	"github.com/hashicorp/consul-controller/api/v1alpha1"
 	"github.com/hashicorp/consul-controller/controllers"
 	// +kubebuilder:scaffold:imports
 )
@@ -42,7 +42,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(consuliov1alpha1.AddToScheme(scheme))
+	utilruntime.Must(v1alpha1.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 
@@ -87,13 +87,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.ServiceDefaultReconciler{
+	if err = (&controllers.ServiceDefaultsReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("ServiceDefault"),
+		Log:    ctrl.Log.WithName("controllers").WithName("ServiceDefaults"),
 		Scheme: mgr.GetScheme(),
 		Consul: consulClient,
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ServiceDefault")
+		setupLog.Error(err, "unable to create controller", "controller", "ServiceDefaults")
+		os.Exit(1)
+	}
+	if err = (&v1alpha1.ServiceDefaults{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "ServiceDefaults")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder

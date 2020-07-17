@@ -21,32 +21,32 @@ import (
 	"strings"
 
 	"github.com/go-logr/logr"
-	consulapi "github.com/hashicorp/consul/api"
+	capi "github.com/hashicorp/consul/api"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	consuliov1alpha1 "github.com/hashicorp/consul-controller/api/v1alpha1"
+	"github.com/hashicorp/consul-controller/api/v1alpha1"
 )
 
-// ServiceDefaultReconciler reconciles a ServiceDefault object
-type ServiceDefaultReconciler struct {
+// ServiceDefaultsReconciler reconciles a ServiceDefaults object
+type ServiceDefaultsReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
-	Consul *consulapi.Client
+	Consul *capi.Client
 }
 
-// +kubebuilder:rbac:groups=consul.io,resources=servicedefaults,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=consul.io,resources=servicedefaults/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=consul.hashicorp.com,resources=servicedefaults,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=consul.hashicorp.com,resources=servicedefaults/status,verbs=get;update;patch
 
-func (r *ServiceDefaultReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *ServiceDefaultsReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
 	logger := r.Log.WithValues("servicedefault", req.NamespacedName)
-	svcDefault := consuliov1alpha1.ServiceDefault{}
+	svcDefaults := v1alpha1.ServiceDefaults{}
 
-	err := r.Client.Get(ctx, req.NamespacedName, &svcDefault)
+	err := r.Client.Get(ctx, req.NamespacedName, &svcDefaults)
 	if errors.IsNotFound(err) {
 		return ctrl.Result{}, nil
 	} else if err != nil {
@@ -54,37 +54,36 @@ func (r *ServiceDefaultReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 		return ctrl.Result{}, err
 	}
 
-	if svcDefault.ObjectMeta.DeletionTimestamp.IsZero() {
+	if svcDefaults.ObjectMeta.DeletionTimestamp.IsZero() {
 
 	}
 
 	// check to see if consul has service default with the same name
-	entry, _, err := r.Consul.ConfigEntries().Get(svcDefault.Kind, svcDefault.Name, &consulapi.QueryOptions{})
+	entry, _, err := r.Consul.ConfigEntries().Get(svcDefaults.Kind, svcDefaults.Name, &capi.QueryOptions{})
 	//if a config entry with this name does not exist
 	if err != nil && strings.Contains(err.Error(), "404") {
 		//create the config entry
-		consulConfigEntry := svcDefault.ToConsul()
-		_, _, err := r.Consul.ConfigEntries().Set(consulConfigEntry, &consulapi.WriteOptions{})
+		consulConfigEntry := svcDefaults.ToConsul()
+		_, _, err := r.Consul.ConfigEntries().Set(consulConfigEntry, &capi.WriteOptions{})
 		if err != nil {
 			return ctrl.Result{}, err
 		}
 	} else if err != nil {
 		//something went wrong and we should probably exit with a sensible error
 	} else {
-		if !svcDefault.MatchesConsul(entry) {
-			_, _, err := r.Consul.ConfigEntries().Set(svcDefault.ToConsul(), &consulapi.WriteOptions{})
+		if !svcDefaults.MatchesConsul(entry) {
+			_, _, err := r.Consul.ConfigEntries().Set(svcDefaults.ToConsul(), &capi.WriteOptions{})
 			if err != nil {
 				return ctrl.Result{}, nil
 			}
 		}
 	}
 
-
 	return ctrl.Result{}, nil
 }
 
-func (r *ServiceDefaultReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *ServiceDefaultsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&consuliov1alpha1.ServiceDefault{}).
+		For(&v1alpha1.ServiceDefaults{}).
 		Complete(r)
 }

@@ -30,12 +30,12 @@ import (
 )
 
 func TestServiceDefaultsController_testFoo(t *testing.T) {
-	svc := &v1alpha1.ServiceDefault{
+	svc := &v1alpha1.ServiceDefaults{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "",
 			Namespace: "",
 		},
-		Spec: v1alpha1.ServiceDefaultSpec{
+		Spec: v1alpha1.ServiceDefaultsSpec{
 			Protocol:    "",
 			MeshGateway: v1alpha1.MeshGatewayConfig{},
 			Expose:      v1alpha1.ExposeConfig{},
@@ -48,7 +48,7 @@ func TestServiceDefaultsController_testFoo(t *testing.T) {
 
 	client := fake.NewFakeClientWithScheme(s, svc)
 
-	r := controllers.ServiceDefaultReconciler{
+	r := controllers.ServiceDefaultsReconciler{
 		Client: client,
 		Log:    nil,
 		Scheme: nil,
@@ -63,8 +63,6 @@ func TestServiceDefaultsController_testFoo(t *testing.T) {
 	})
 
 	require.False(t, resp.Requeue)
-
-	require.Equal(t, svc.Status.Foo, "set")
 
 	require.NoError(t, err)
 

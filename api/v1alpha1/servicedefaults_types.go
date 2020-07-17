@@ -24,19 +24,19 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// ServiceDefaultSpec defines the desired state of ServiceDefault
-type ServiceDefaultSpec struct {
+// ServiceDefaultsSpec defines the desired state of ServiceDefaults
+type ServiceDefaultsSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
 	Protocol    string            `json:"protocol,omitempty"`
-	// +kubebuilder:validation:Enum:=["","remote","local","none"]
 	MeshGateway MeshGatewayConfig `json:"meshGateway,omitempty"`
 	Expose      ExposeConfig      `json:"expose,omitempty"`
 	ExternalSNI string            `json:"externalSNI,omitempty"`
 }
 
-// ServiceDefaultStatus defines the observed state of ServiceDefault
-type ServiceDefaultStatus struct {
+// ServiceDefaultsStatus defines the observed state of ServiceDefaults
+type ServiceDefaultsStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -44,16 +44,29 @@ type ServiceDefaultStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// ServiceDefault is the Schema for the servicedefaults API
-type ServiceDefault struct {
+// ServiceDefaults is the Schema for the servicedefaults API
+type ServiceDefaults struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ServiceDefaultSpec   `json:"spec,omitempty"`
-	Status ServiceDefaultStatus `json:"status,omitempty"`
+	Spec   ServiceDefaultsSpec   `json:"spec,omitempty"`
+	Status ServiceDefaultsStatus `json:"status,omitempty"`
 }
 
-func (s *ServiceDefault) ToConsul() *consulapi.ServiceConfigEntry {
+// +kubebuilder:object:root=true
+
+// ServiceDefaultsList contains a list of ServiceDefaults
+type ServiceDefaultsList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ServiceDefaults `json:"items"`
+}
+
+func init() {
+	SchemeBuilder.Register(&ServiceDefaults{}, &ServiceDefaultsList{})
+}
+
+func (s *ServiceDefaults) ToConsul() *consulapi.ServiceConfigEntry {
 	return &consulapi.ServiceConfigEntry{
 		Kind:      s.Kind,
 		Name:      s.Name,
@@ -71,19 +84,6 @@ func (s *ServiceDefault) ToConsul() *consulapi.ServiceConfigEntry {
 }
 
 // this will check if the consul struct shares the same spec as the spec of the resource
-func (in *ServiceDefault) MatchesConsul(entry consulapi.ConfigEntry) bool {
+func (s *ServiceDefaults) MatchesConsul(entry consulapi.ConfigEntry) bool {
 	return true
-}
-
-// +kubebuilder:object:root=true
-
-// ServiceDefaultList contains a list of ServiceDefault
-type ServiceDefaultList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ServiceDefault `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&ServiceDefault{}, &ServiceDefaultList{})
 }

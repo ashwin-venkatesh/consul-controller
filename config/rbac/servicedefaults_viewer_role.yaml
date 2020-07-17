@@ -2,10 +2,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: servicedefault-viewer-role
+  name: servicedefaults-viewer-role
 rules:
 - apiGroups:
-  - consul.io
+  - consul.hashicorp.com
   resources:
   - servicedefaults
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - consul.io
+  - consul.hashicorp.com
   resources:
   - servicedefaults/status
   verbs:

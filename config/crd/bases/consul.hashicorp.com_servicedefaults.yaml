@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.5
   creationTimestamp: null
-  name: servicedefaults.consul.io
+  name: servicedefaults.consul.hashicorp.com
 spec:
-  group: consul.io
+  group: consul.hashicorp.com
   names:
-    kind: ServiceDefault
-    listKind: ServiceDefaultList
+    kind: ServiceDefaults
+    listKind: ServiceDefaultsList
     plural: servicedefaults
-    singular: servicedefault
+    singular: servicedefaults
   scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: ServiceDefault is the Schema for the servicedefaults API
+      description: ServiceDefaults is the Schema for the servicedefaults API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,7 +34,7 @@ spec:
         metadata:
           type: object
         spec:
-          description: ServiceDefaultSpec defines the desired state of ServiceDefault
+          description: ServiceDefaultsSpec defines the desired state of ServiceDefaults
           properties:
             expose:
               description: ExposeConfig describes HTTP paths to expose through Envoy
@@ -85,12 +85,10 @@ spec:
                   type: string
               type: object
             protocol:
-              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-                Important: Run "make" to regenerate code after modifying this file'
               type: string
           type: object
         status:
-          description: ServiceDefaultStatus defines the observed state of ServiceDefault
+          description: ServiceDefaultsStatus defines the observed state of ServiceDefaults
           type: object
       type: object
   version: v1alpha1

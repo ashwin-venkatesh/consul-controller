@@ -1,7 +1,0 @@
-apiVersion: consul.io/v1alpha1
-kind: ServiceDefault
-metadata:
-  name: servicedefault-sample
-spec:
-  # Add fields here
-  foo: bar
