@@ -25,7 +25,7 @@ const (
 // services
 type MeshGatewayConfig struct {
 	// Mode is the mode that should be used for the upstream connection.
-	Mode MeshGatewayMode `json:"mode,omitempty"`
+	Mode string `json:"mode,omitempty"`
 }
 
 // ExposeConfig describes HTTP paths to expose through Envoy outside of Connect.

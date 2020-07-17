@@ -29,6 +29,7 @@ type ServiceDefaultSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 	Protocol    string            `json:"protocol,omitempty"`
+	// +kubebuilder:validation:Enum:=["","remote","local","none"]
 	MeshGateway MeshGatewayConfig `json:"meshGateway,omitempty"`
 	Expose      ExposeConfig      `json:"expose,omitempty"`
 	ExternalSNI string            `json:"externalSNI,omitempty"`

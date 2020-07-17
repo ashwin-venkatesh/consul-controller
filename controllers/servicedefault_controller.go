@@ -35,7 +35,7 @@ type ServiceDefaultReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
-	Consul consulapi.Client
+	Consul *consulapi.Client
 }
 
 // +kubebuilder:rbac:groups=consul.io,resources=servicedefaults,verbs=get;list;watch;create;update;patch;delete
@@ -48,10 +48,14 @@ func (r *ServiceDefaultReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 
 	err := r.Client.Get(ctx, req.NamespacedName, &svcDefault)
 	if errors.IsNotFound(err) {
-		logger.Error(err, "could not retrieve Service Default")
 		return ctrl.Result{}, nil
 	} else if err != nil {
+		logger.Error(err, "failed to retrieve Service Default")
 		return ctrl.Result{}, err
+	}
+
+	if svcDefault.ObjectMeta.DeletionTimestamp.IsZero() {
+
 	}
 
 	// check to see if consul has service default with the same name
@@ -75,7 +79,6 @@ func (r *ServiceDefaultReconciler) Reconcile(req ctrl.Request) (ctrl.Result, err
 		}
 	}
 
-	//handles deletes
 
 	return ctrl.Result{}, nil
 }
